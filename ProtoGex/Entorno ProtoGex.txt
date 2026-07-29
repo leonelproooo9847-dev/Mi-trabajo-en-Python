@@ -1,0 +1,13 @@
+CREAR :: X, Y
+
+X = 3
+Y = 5
+
+SI (X == 3)
+    MOSTRAR > "X vale 3"        ; esto es un comentario unilinea
+    Y = X + 3
+    MOSTRAR > Y
+SINO
+    MOSTRAR > "X no vale 3"     # esto es un comentario multilinea #
+
+BORRAR :: X, Y
