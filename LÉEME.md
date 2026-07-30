@@ -12,21 +12,21 @@
 
 # Prueba del programa:
 
-    ```
-    ===========================PROGRAMA===========================
-    CREAR :: X, Y
+```
+===========================PROGRAMA===========================
+CREAR :: X, Y
 
-    VER.MEMORIA(X) ; X = INDEF
-    VER.MEMORIA(Y) ; Y = INDEF
-    
-    ; comentario unilineal
-    # comentario multilínea #
+VER.MEMORIA(X) ; X = INDEF
+VER.MEMORIA(Y) ; Y = INDEF
 
-    MOSTRAR > "texto"
+; comentario unilineal
+# comentario multilínea #
 
-    SI (1)
-        MOSTRAR > "esto se ejecuta"
-    SINO
-        MOSTRAR > "esto no se ejecuta"
-    ==============================================================
-    ```
+MOSTRAR > "texto"
+
+SI (1)
+    MOSTRAR > "esto se ejecuta"
+SINO
+    MOSTRAR > "esto no se ejecuta"
+==============================================================
+```
