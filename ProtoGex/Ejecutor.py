@@ -23,14 +23,23 @@ with open(ruta, "r", encoding="utf-8") as archivo:
     ProtoGex = archivo.read()
 
 # IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+# EL EJECUTOR EMPIEZA AQUÍ.
 # IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
 
 def ejecutar(entorno):
 
-    try:
+    try: # probamos
         Resultado = Gestionar(entorno)
+        # estructura [CODIGO_DE_RETORNO, DATOS]
 
         rcode = Resultado[0]
+
+        # Los datos devueltos con el tipo de retorno:
+        #     ERR y CTO
+        # son str.
+
+        # Los datos devueltos con OK es la estructura
+        # y secuencias de tokens producidos por el lexer.
 
         if rcode == "ERR":
             imprimir_ERR(Resultado[1])
