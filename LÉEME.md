@@ -1,17 +1,18 @@
 # ProtoGex
 
-    -> Lenguaje de programación básico orientado a la educación.
-    El lenguaje utiliza una sintaxis española lo que ayuda a identificar acciones
-    e instrucciones a un hispanohablante.
+    -> Lenguaje de programación básico orientado a la enseñanza.
+    El lenguaje utiliza una sintaxis española lo que facilita a identificar acciones
+    e instrucciones a usuarios hispanohablante.
 
 # Estado actual:
 
     -> En proceso, actualmente se encuentra en el desarrollo del parser.
-    Falta la estructuración del árbol sintáctico y el código de Bytes y
-    por último la máquina virtual.
+    Falta la estructuración del árbol sintáctico y el código de bytes (bytecode)
+    y por último la máquina virtual.
 
 # Prueba del programa:
 
+    ```
     ===========================PROGRAMA===========================
     CREAR :: X, Y
 
@@ -28,4 +29,4 @@
     SINO
         MOSTRAR > "esto no se ejecuta"
     ==============================================================
-    
+    ```
