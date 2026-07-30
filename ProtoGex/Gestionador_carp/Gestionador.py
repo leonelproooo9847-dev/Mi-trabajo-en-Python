@@ -54,7 +54,7 @@ def ejecutar_ModulCTO(
         return mensaje_CTO
     except Exception:
         traceCTOMC = traceback.format_exc()
-        return f"\x1b[31;1m[CTO2]:\xb1[31m\n\tocurrió un problema en el módulo ModulCTO.py en el Gestionador.py\n\n\tdatos:\n\t\t{traceCTOMC}\x1b[0m"
+        return f"\x1b[31;1m[CTO2]:\x1b[31m\n\tocurrió un problema en el módulo ModulCTO.py en el Gestionador.py\n\n\tdatos:\n\t\t{traceCTOMC}\x1b[0m"
     
 
 def Gestionar(
