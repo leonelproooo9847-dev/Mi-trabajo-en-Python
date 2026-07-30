@@ -1,0 +1,52 @@
+ET1 (separador):
+	no entrega error, se encarga de separar línea y caracteres del codigo fuente para su analisis procedural
+	por esta razón no hay error, porque no comprende, solo formaliza.
+
+ET2 (agrupador):
+	secuencia de escape cortada:
+	{"SUB": "ET2", "ERROR": {"tipo": "SecuenciaEscCortada", "columna": columna-1, "linea": NDL}}
+
+	secuencia de escape invalida:
+	{"SUB": "ET2", "ERROR": {"tipo": "SecuenciaEscInvalida", "columna": columna-1, "linea": NDL}}
+
+ET3 (cadenas de textos):
+	cadena no cerrada:
+	{"SUB": "ET3", "ERROR": {"tipo": "CadenaNoCerrada", "columna": pos, "linea": NDL}}
+
+ET4 (eliminación de comentarios):
+	comentario abierto:
+	{"SUB": "ET4", "ERROR": {"tipo": "ComentarioAbierto", "linea": pos}}
+
+ET5 (verificación de indentación):
+	indentación invalida
+	{"SUB": "ET5", "ERROR": {"tipo": "IndentacionInvalida", "total_tabesp": total, "historial": historial, "linea": NDL}}
+
+ET6 (simbolos compuestos):
+	simbolo compuesto invalido:
+	{"SUB": "ET6", "ERROR": {"tipo": "CompuestoInvalido", "fallo": nuevo_simb, "columna": pos, "linea": NDL}}
+
+	simbolo compuesto desconocido:
+	{"SUB": "ET6", "ERROR": {"tipo": "CompuestoDesconocido", "fallo": nuevo_simb, "columna": pos, "linea": NDL}}
+
+ET7 (verificación de tipos):
+	letras en un decimal:
+	{"SUB": "ET7", "ERROR": {"tipo": "LetrasEnUnDecimal", "fallo": t, "columna": columna, "linea": NDL}}
+
+	excepcion muy extraña:
+	{"SUB": "ET7", "ERROR": {"tipo": "Extraño", "fallo": t, "columna": columna, "linea": NDL}}
+
+ET8 (secuencia de tokens):
+	mala estructura de parentesis:
+	{"SUB": "ET8", "ERROR": {"tipo": "MalaEstructuraDeParentesis", "columna": [ub_c, colum], "linea": [ub_l, NDL]}}
+
+	mala estructura de llaves:
+	{"SUB": "ET8", "ERROR": {"tipo": "MalaEstructuraDeLlaves", "columna": [ub_c, colum], "linea": [ub_l, NDL]}}
+
+	mala estructura de bloques/corchetes:
+	{"SUB": "ET8", "ERROR": {"tipo": "MalaEstructuraDeCorchetes", "columna": [ub_c, colum], "linea": [ub_l, NDL]}}
+
+	aparición de cierre sin una sentencia de apertura:
+	{"SUB": "ET8", "ERROR": {"tipo": "CierreSinApertura", "columna": colum, "linea": NDL}}
+
+	apertura sin cierres terminados:
+	{"SUB": "ET8", "ERROR": {"tipo": "AperturaSinCierre", "columna": ub_c, "linea": ub_l}}
