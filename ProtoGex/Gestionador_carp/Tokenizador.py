@@ -33,6 +33,8 @@ if en_prueba:
         texto_crudo = leer.read()
 
 def tokenizador(texto: str):
+    if not isinstance(texto, str):
+        raise TypeError(f"LEXER: Objeto invalido, se esperaba una cadena y apareció {type(texto)}")
     
     '''
     procesos:
