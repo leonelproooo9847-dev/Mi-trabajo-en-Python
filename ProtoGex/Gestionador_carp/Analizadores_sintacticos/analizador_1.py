@@ -38,7 +38,8 @@ if False: # solo comentarios multilineas.
 
         Además secuencias unarias como "-3" y "+4" o "+3.1416" y "-23.65" también
         vienen garantizado por el lexer, y lo engloba todo en un único tipo común:
-        el ENT y el FLOT.
+        el ENT y el FLOT. (bueno... debería. Porque en realidad no está implementado, pero
+        imaginemos que tenemos la realidad distorsionada y que sí lo hace).
     '"""
 
     '''"
