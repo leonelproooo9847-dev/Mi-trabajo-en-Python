@@ -15,11 +15,13 @@ Explicacion didactica:
         Ahora, ¿cómo sabemos si la expresión es valida o no? Para eso está el analisis
         sintáctico (o generalmente llamado PARSER). Existen varios tipos de PARSERs,
         Python en la versión 3.9 utiliza un PARSER llamado PEG, en C puede variar,
-        pero generalmente utiliza uno recursivo descendente, veamos las diferencias:
+        pero generalmente utiliza uno recursivo descendente.
+
+        Ahora, veamos las diferencias:
 
         Recursivo descendente:
             Este PARSER analiza diciendo "estoy en verificando una expresión, pero necesito
-            hacer recurción para seguír analizando la misma secuencia otra vez." por
+            llamarme nuevamente para seguir analizando la misma secuencia otra vez." por
             eso se dice que es recursivo, se llama a sí mismo.
 
             La descendencia quiere decir que, a medida que se llama a sí misma, va descendiendo
@@ -54,7 +56,7 @@ Explicacion didactica:
                 de hecho el grafico ya muestra una cadena descendiente hacia la derecha.
 
         PEG:
-            El Parser Expression Grammar (o Parser de Expresión Gramática) analisa diciendo
+            El Parser Expression Grammar (o Parser de Expresión Gramática) analiza diciendo
             "tengo una serie de casos de expresiones, voy verificando la expresion en el
             primer caso, y si falla, voy al siguiente". Es, desde mi perspectiva, la más
             facil de imaginar.
@@ -74,11 +76,11 @@ Explicacion didactica:
             ├─► EXP_BIN
             |   ├─► ENT  : VALOR ─► OK
             |   ├─► OP   : OP    ─► OK
-            |   └─► APER : sale del caso EXP_BIN y va al EXP_NOT
+            |   └─► NOT : sale del caso EXP_BIN y va al EXP_NOT
             |
             └─► EXP_NOT
                 ├─► NOT  : NO  ─► OK
-                └─► EXP  : verifica si la expresión es solo un valor o ( EXP )
+                └─► EXP  : verifica si la expresión es solo un valor o anidamiento.
                     ├─► ENT  : VALOR ─► OK
                     |
                     |
@@ -91,4 +93,7 @@ Explicacion didactica:
             tienen profundidad.
 
         En mi caso, planeo hacer un parser más separados en procesos, con diferentes
-        responsabilidades entre ellas.
+        responsabilidades entre ellas. Obvio, cabe aclarar que cada variante de PARSERs
+        presentan ventajas y desventajas, eso hoy no lo vamos a detallar mucho, ya que
+        el objetivo de esta explicación es que entendieran el análisis sintáctico, no
+        ver cual es mejor o peor.
