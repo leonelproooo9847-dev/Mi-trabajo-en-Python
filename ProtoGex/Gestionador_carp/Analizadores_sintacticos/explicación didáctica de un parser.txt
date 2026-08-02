@@ -1,0 +1,94 @@
+Explicacion didactica:
+
+        En los lenguajes hay algo que se llaman expresiones, cuya expresiones tienen
+        una forma especifica segun la secuencia de token (el elemento minimo clasificado 
+        por el lexer) que aparezca.
+
+        Por ejemplo, cuando ves algo como:
+            2 + 3
+        
+        El analizador léxico (lexer) produce:
+            ENT("2"), OP("+"), ENT("3")
+
+        a esa secuencia de tokens se le dice que es una expresión:
+
+        Ahora, ¿cómo sabemos si la expresión es valida o no? Para eso está el analisis
+        sintáctico (o generalmente llamado PARSER). Existen varios tipos de PARSERs,
+        Python en la versión 3.9 utiliza un PARSER llamado PEG, en C puede variar,
+        pero generalmente utiliza uno recursivo descendente, veamos las diferencias:
+
+        Recursivo descendente:
+            Este PARSER analiza diciendo "estoy en verificando una expresión, pero necesito
+            hacer recurción para seguír analizando la misma secuencia otra vez." por
+            eso se dice que es recursivo, se llama a sí mismo.
+
+            La descendencia quiere decir que, a medida que se llama a sí misma, va descendiendo
+            por sus propias reglas.
+
+            Por ejemplo, una forma más grafica sería:
+
+                Imagina que tenemos la siguiente secuencia de tokens:
+                    ENT, OP, ENT
+
+                El parser tiene algo llamado EXP y dentro contiene las reglas necesarias
+                para analizar la expresión:
+
+                EXP: reglas
+                    EXPRESION_BINARIA = VALOR -> OP -> EXP
+
+                Observa como en la primera regla de expresiones binarias se llama a sí misma
+                mediante EXP.
+
+                EXP
+                └─► EXPRESION_BINARIA
+                    ├─► ENT  : VALOR ─► OK
+                    ├─► OP   : OP    ─► OK
+                    └─► EXP  : se llama a sí misma (recursión)
+                        |
+                        └─► EXPRESION_BINARIA (desciende)
+                            ├─► ENT  : VALOR ─► OK
+                            |
+                            ▼
+                            No hay mas tokens. Termina correctamente.
+                
+                de hecho el grafico ya muestra una cadena descendiente hacia la derecha.
+
+        PEG:
+            El Parser Expression Grammar (o Parser de Expresión Gramática) analisa diciendo
+            "tengo una serie de casos de expresiones, voy verificando la expresion en el
+            primer caso, y si falla, voy al siguiente". Es, desde mi perspectiva, la más
+            facil de imaginar.
+
+            Imagina la siguiente secuencia de tokens:
+                ENT, OP, NOT, ENT
+
+            El parser tiene una serie de casos gramáticos del lenguaje:
+
+            Gramática:
+                EXP_BIN = VALOR, OP, VALOR┐
+                                 ↑        |
+                                 └─vuelve─┘
+                EXP_NOT = NO, EXP
+            
+            Gramática:
+            ├─► EXP_BIN
+            |   ├─► ENT  : VALOR ─► OK
+            |   ├─► OP   : OP    ─► OK
+            |   └─► APER : sale del caso EXP_BIN y va al EXP_NOT
+            |
+            └─► EXP_NOT
+                ├─► NOT  : NO  ─► OK
+                └─► EXP  : verifica si la expresión es solo un valor o ( EXP )
+                    ├─► ENT  : VALOR ─► OK
+                    |
+                    |
+                    ▼
+                    No hay más tokens. Termina correctamente.
+            
+            Generalmente no se llama a sí misma, si no que va probando casos.
+            Sin embargo, eso no significa que no tenga que hacer recursión, de
+            hecho, sí lo hace, pero solo con estructuras anidadas, las cuales
+            tienen profundidad.
+
+        En mi caso, planeo hacer un parser más separados en procesos, con diferentes
+        responsabilidades entre ellas.
