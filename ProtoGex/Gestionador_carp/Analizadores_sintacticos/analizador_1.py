@@ -11,8 +11,9 @@ if en_prueba:
         ['TOKEN', {'t': '+', 'tipo': 'SUMA', 'columna': 7}], 
         ['TOKEN', {'t': '4', 'tipo': 'ENT', 'columna': 9}], 
         ['TOKEN', {'t': '*', 'tipo': 'ASTE', 'columna': 11}], 
-        ['TOKEN', {'t': '2', 'tipo': 'ENT', 'columna': 13}],
-        ["FIN"]
+        ['TOKEN', {'t': '_NO_', 'tipo': 'OP_LOG', 'columna': 13}], 
+        ['TOKEN', {'t': '2', 'tipo': 'ENT', 'columna': 18}], 
+        ['FIN']
     ]
 
 if False: # solo comentarios multilineas.
@@ -38,8 +39,8 @@ if False: # solo comentarios multilineas.
 
         Además secuencias unarias como "-3" y "+4" o "+3.1416" y "-23.65" también
         vienen garantizado por el lexer, y lo engloba todo en un único tipo común:
-        el ENT y el FLOT. (bueno... debería. Porque en realidad no está implementado, pero
-        imaginemos que tenemos la realidad distorsionada y que sí lo hace).
+        el ENT y el FLOT. (bueno... debería. Porque en realidad no está implementado,
+        pero imaginemos que tenemos la realidad distorsionada y que sí lo hace).
     '"""
 
     '''"
@@ -51,7 +52,15 @@ if False: # solo comentarios multilineas.
     "'''
 
     '''"programa a prueba:
-    X = 3 + 4 * 2
+    SI  (
+        (2 = 3)
+        _O_
+        (
+            VERDAD 
+            _Y_
+            _NO_ 
+        )
+    )
     "'''
 
 def validador(
@@ -137,13 +146,13 @@ def validador(
     INDENT      = "INDENT"
     DESINDENT   = "DESINDENT"
 
-    BIN_EXPRESION   = 1 # expresiones binarias: 2 + 3
-    NO_EXPRESION    = 2 # expresiones del NO lógico (not): _NO_ (...)
-    ANID_EXPRESION  = 3 # expresiones de anidamientos: ( ... ), [ ... ], { ... }
+    EXPRESION_BINARIA   = 1 # expresiones binarias: 2 + 3
+    EXPRESION_LOG_NO    = 2 # expresiones del NO lógico (not): _NO_ (...)
+    EXPRESION_ANIDADA   = 3 # expresiones de anidamientos: ( ... ), [ ... ], { ... }
 
-    CASO_ACTUAL = BIN_EXPRESION
+    CASO_ACTUAL = EXPRESION_BINARIA
 
-    # caso 1 (BIN_EXPRESION)
+    # caso 1 (EXPRESION_BINARIA)
     ES_VALOR = True
 
     termino = True
@@ -174,7 +183,7 @@ def validador(
 
             t, tipo, columna_actual = acceder(valor)
 
-            if CASO_ACTUAL == BIN_EXPRESION:
+            if CASO_ACTUAL == EXPRESION_BINARIA:
                 if tipo in _VALOR_ and ES_VALOR:
                     termino = True
                     ES_VALOR = False
@@ -189,24 +198,57 @@ def validador(
                         # verifico si:
                         #     es una expresion de aninamiento
                         #     o una expresion de NO lógico (not)
+                        termino = False
 
                         if tipo in _ANID_:
-                            CASO_ACTUAL = ANID_EXPRESION
+                            CASO_ACTUAL = EXPRESION_ANIDADA
                         elif tipo in _OP_NO_:
-                            CASO_ACTUAL = NO_EXPRESION
+                            CASO_ACTUAL = EXPRESION_LOG_NO
                         else:
-                            return ["CTO", "EXTRAÑO_1"]
-                        return ["DP", CASO_ACTUAL, ES_VALOR]
+                            return ["CTO", {"EXTRAÑO_1"}]
                         continue
+
                     # si, en cambio, ocurrió cuando esperaba un operador:
                     elif not ES_VALOR:
                         # entonces espero una expresion de anidamiento
-                        CASO_ACTUAL = ANID_EXPRESION
-                        return ["DP", CASO_ACTUAL, ES_VALOR]
+                        termino = False
+                        CASO_ACTUAL = EXPRESION_ANIDADA
                         continue
+
+            elif CASO_ACTUAL == EXPRESION_LOG_NO:
+                if tipo in _OP_NO_ and t in _OP_NO_:
+                    i += 1 # avanzo al siguiente
+                    elemento = secuencia[i]
+                    
+                    tipo_de_elemento = elemento[0]
+
+                    if tipo_de_elemento != TOKEN:
+                        return ["ERR", {"EXPRESION_NO_LOG_INCOMPLETA"}]
+                    else:
+                        valor = elemento[1]
+                        
+                        t, tipo, columna_actual = acceder(valor)
+
+                        if tipo in _VALOR_:
+                            termino = True
+                            ES_VALOR = False
+                            CASO_ACTUAL = EXPRESION_BINARIA
+                            i += 1 # avanzo al siguiente
+                        elif tipo in _ANID_:
+                            termino = False
+                            CASO_ACTUAL = EXPRESION_ANIDADA        
+                            return ["DP", {"desde": "EXPRESION_LOG_NO", "PASAR": CASO_ACTUAL}]
+                        
+                        continue
+                else:
+                    return ["CTO", "EXTRAÑO_2"]
+                    
+
         elif tipo_de_elemento == FIN:
             if termino:
-                return ["OK", "EXPRESION_VALIDA"]
+                return ["OK", {"EXPRESION_VALIDA"}]
+            else:
+                return ["ERR", {"EXPRESION_INCOMPLETA"}]
         else:
             return ["ERR", {"TIPO_ELEMENTO_EXTRAÑO"}]
 
