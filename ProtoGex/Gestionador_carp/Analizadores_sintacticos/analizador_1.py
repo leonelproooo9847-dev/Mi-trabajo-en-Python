@@ -52,15 +52,7 @@ if False: # solo comentarios multilineas.
     "'''
 
     '''"programa a prueba:
-    SI  (
-        (2 = 3)
-        _O_
-        (
-            VERDAD 
-            _Y_
-            _NO_ 
-        )
-    )
+    X = 3 + 4 * _NO_ 2
     "'''
 
 def validador(
