@@ -1,20 +1,9 @@
 # analizador_1.py
 
-en_prueba = True
+en_prueba = False
 
 if en_prueba:
-    prueba = [
-        ['NVL', 1], 
-        ['TOKEN', {'t': 'X', 'tipo': 'IDENT', 'columna': 1}], 
-        ['TOKEN', {'t': '=', 'tipo': 'IGUA', 'columna': 3}], 
-        ['TOKEN', {'t': '3', 'tipo': 'ENT', 'columna': 5}], 
-        ['TOKEN', {'t': '+', 'tipo': 'SUMA', 'columna': 7}], 
-        ['TOKEN', {'t': '4', 'tipo': 'ENT', 'columna': 9}], 
-        ['TOKEN', {'t': '*', 'tipo': 'ASTE', 'columna': 11}], 
-        ['TOKEN', {'t': '_NO_', 'tipo': 'OP_LOG', 'columna': 13}], 
-        ['TOKEN', {'t': '2', 'tipo': 'ENT', 'columna': 18}], 
-        ['FIN']
-    ]
+    prueba = None
 
 if False: # solo comentarios multilineas.
 
@@ -188,7 +177,7 @@ def validador(
                 i += 1 # avanzo al siguiente
                 continue
             else:
-                return ["ERR", "EXP_INCOMPLETO"]
+                return ["ERR", "LINEA_INCOMPLETA"]
 
         elif tipo_de_elemento == TOKEN:
             valor = elemento[1]
@@ -210,7 +199,7 @@ def validador(
                             termino = True
                             profundidad -= 1
                     else:
-                        return ["ERR", 0xa1]
+                        return ["ERR", "a1"]
                 
                 elif tipo_ in _OP_:
                     if tipo in _VALOR_:
@@ -220,11 +209,11 @@ def validador(
                             termino = False
                             profundidad += 1
                         else:
-                            return ["ERR", 0x02]
+                            return ["ERR", "02"]
                     elif tipo in _OP_NO_ and t in _OP_NO_:
                         termino = False
                     else:
-                        return ["ERR", 0xa2]
+                        return ["ERR", "a2"]
                 
                 elif tipo_ in _OP_NO_ and t_ in _OP_NO_:
                     if tipo in _VALOR_:
@@ -234,9 +223,9 @@ def validador(
                             termino = False
                             profundidad += 1
                         else:
-                            return ["ERR", 0x03]
+                            return ["ERR", "03"]
                     else:
-                        return ["ERR", 0xa3]
+                        return ["ERR", "a3"]
                 
                 elif tipo_ in _ANID_:
                     if tipo_ in ("APAR", "ALLV", "ABLQ"):
@@ -254,7 +243,7 @@ def validador(
                         elif tipo in _OP_NO_ and t in _OP_NO_:
                             termino = False
                         else:
-                            return ["ERR", 0xa4]
+                            return ["ERR", "a4"]
                     else:
                         if tipo in _ANID_:
                             if tipo in ("APAR", "ALLV", "ABLQ"):
@@ -268,20 +257,21 @@ def validador(
                         elif tipo in _OP_:
                             termino = False
                         else:
-                            return ["ERR", 0xb4]
+                            return ["ERR", "b4"]
             
             if (tipo in _OP_ and t not in _OP_NO_) and memoria is None:
-                return ["ERR", 0xa5]
+                return ["ERR", "a5"]
             else:
                 memoria = valor
         
         if tipo_de_elemento == FIN:
             if termino:
-                return ["OK", None]
+                return ["OK", "SINTAXIS_VALIDA"]
             else:
                 return ["ERR", "EXP_INCOMPLETA"]
         
         i+=1
+
 
 if en_prueba:
     print(validador(prueba))
