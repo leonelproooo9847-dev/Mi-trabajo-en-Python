@@ -13,19 +13,14 @@ def imprimir_CTO(CTO: str):
 
 carpeta = Path(__file__).parent
 
-archivo_txt = carpeta / "ProtoGex Entorno.txt"
+archivo_txt = carpeta / "Entorno ProtoGex.txt"
 ruta = str(archivo_txt)
-
-archivo_gestor = carpeta / "Gestionador" / "Gestionador.py"
-archivo_gestor = str(archivo_gestor)
 
 with open(ruta, "r", encoding="utf-8") as archivo:
     ProtoGex = archivo.read()
 
-# IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
 # EL EJECUTOR EMPIEZA AQUÍ.
 # IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-
 def ejecutar(entorno):
 
     try: # probamos
@@ -54,3 +49,4 @@ def ejecutar(entorno):
         imprimir_CTO(ejecutar_ModulCTO(["CTO", {"ORIGEN": "EjecP", "SUB": "Gestionador"}, traceCTOGS]))
 
 ejecutar(ProtoGex)
+# IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
