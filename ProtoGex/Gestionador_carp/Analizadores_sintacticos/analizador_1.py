@@ -27,9 +27,7 @@ if False: # solo comentarios multilineas.
         gramáticas formales ya descritas en EXP. No intenta ver el contexo, solo
         verificar, por esta razón este proceso no modificaría la estructura, solo
         la observa.
-    '"""
-
-    """'
+    
         Dado a esto, debo aclarar 2 cosas fundamentales de mi lexer:
 
         El lexer ya resuelve lo que es los anidamientos, es decir, ya da aviso
@@ -42,17 +40,46 @@ if False: # solo comentarios multilineas.
         el ENT y el FLOT. (bueno... debería. Porque en realidad no está implementado,
         pero imaginemos que tenemos la realidad distorsionada y que sí lo hace).
     '"""
-
+    
     '''"
-        EXP = {
-            "C1": (_VALOR_, _OP_),
-            "C2": (_OP_NO_),
-            "C3": (_ANID_, "EXP", _ANID_)
-        }
-    "'''
+        Tuve un cambio de perspectiva. En vez de hacer un autómata que solo reconoce
+        en qué estado se encuentra, decidí hacer un autómata que decida seguhn el token
+        vió anteriormente.
 
-    '''"programa a prueba:
-    X = 3 + 4 * _NO_ 2
+        Si vio VALOR:
+            ANID (APER)     :   OK
+            ANID (CIER)     :   OK
+            OP              :   OK
+            NO_LOG          :   NO
+            VALOR           :   NO  (puede que lo cambie)
+
+        Si vio OP:
+            VALOR           :   OK
+            NO_LOG          :   OK
+            ANID (APER)     :   OK
+            ANID (CIER)     :   NO
+            OP              :   NO
+        
+        Si vio NO_LOG:
+            VALOR           :   OK
+            ANID (APER)     :   OK
+            ANID (CIER)     :   NO
+            OP              :   NO
+            NO_LOG          :   NO
+
+        Si vio ANID:
+            (APER):
+                ANID (APER) :   OK
+                ANID (CIER) :   OK
+                NO_LOG      :   OK
+                VALOR       :   OK
+                OP          :   NO
+            (CIER):
+                ANID (APER) :   OK
+                ANID (CIER) :   OK
+                OP          :   OK
+                VALOR       :   NO
+                NO_LOG      :   NO
     "'''
 
 def validador(
@@ -135,19 +162,10 @@ def validador(
     FIN         = "FIN"
     NVL         = "NVL"
     TOKEN       = "TOKEN"
-    INDENT      = "INDENT"
-    DESINDENT   = "DESINDENT"
 
-    EXPRESION_BINARIA   = 1 # expresiones binarias: 2 + 3
-    EXPRESION_LOG_NO    = 2 # expresiones del NO lógico (not): _NO_ (...)
-    EXPRESION_ANIDADA   = 3 # expresiones de anidamientos: ( ... ), [ ... ], { ... }
-
-    CASO_ACTUAL = EXPRESION_BINARIA
-
-    # caso 1 (EXPRESION_BINARIA)
-    ES_VALOR = True
-
+    profundidad = 0
     termino = True
+    memoria = None
 
     i = 0
     longitud = len(secuencia)
@@ -163,87 +181,107 @@ def validador(
         if tipo_de_elemento == NVL:
             valor = elemento[1]
             linea_actual = valor
-            if termino:
+            if termino or profundidad != 0:
+                if profundidad == 0:
+                    memoria = None
                 termino = False
                 i += 1 # avanzo al siguiente
                 continue
             else:
-                return ["ERR", {"ERR_1"}]
+                return ["ERR", "EXP_INCOMPLETO"]
 
         elif tipo_de_elemento == TOKEN:
             valor = elemento[1]
 
             t, tipo, columna_actual = acceder(valor)
-
-            if CASO_ACTUAL == EXPRESION_BINARIA:
-                if tipo in _VALOR_ and ES_VALOR:
-                    termino = True
-                    ES_VALOR = False
-                    i += 1 # avanzo al siguiente
-                elif tipo in _OP_ and not ES_VALOR:
-                    termino = False
-                    ES_VALOR = True
-                    i += 1 # avanzo al siguiente
-                else:
-                    # si el fallo ocurrió cuando esperaba un operando:
-                    if ES_VALOR:
-                        # verifico si:
-                        #     es una expresion de aninamiento
-                        #     o una expresion de NO lógico (not)
+            
+            
+            if memoria is not None:
+                t_, tipo_, columna_ = acceder(memoria)
+                
+                if tipo_ in _VALOR_:
+                    if tipo in _OP_:
                         termino = False
-
-                        if tipo in _ANID_:
-                            CASO_ACTUAL = EXPRESION_ANIDADA
-                        elif tipo in _OP_NO_:
-                            CASO_ACTUAL = EXPRESION_LOG_NO
-                        else:
-                            return ["CTO", {"EXTRAÑO_1"}]
-                        continue
-
-                    # si, en cambio, ocurrió cuando esperaba un operador:
-                    elif not ES_VALOR:
-                        # entonces espero una expresion de anidamiento
-                        termino = False
-                        CASO_ACTUAL = EXPRESION_ANIDADA
-                        continue
-
-            elif CASO_ACTUAL == EXPRESION_LOG_NO:
-                if tipo in _OP_NO_ and t in _OP_NO_:
-                    i += 1 # avanzo al siguiente
-                    elemento = secuencia[i]
-                    
-                    tipo_de_elemento = elemento[0]
-
-                    if tipo_de_elemento != TOKEN:
-                        return ["ERR", {"EXPRESION_NO_LOG_INCOMPLETA"}]
-                    else:
-                        valor = elemento[1]
-                        
-                        t, tipo, columna_actual = acceder(valor)
-
-                        if tipo in _VALOR_:
-                            termino = True
-                            ES_VALOR = False
-                            CASO_ACTUAL = EXPRESION_BINARIA
-                            i += 1 # avanzo al siguiente
-                        elif tipo in _ANID_:
+                    elif tipo in _ANID_:
+                        if tipo in ("APAR", "ALLV", "ABLQ"):
                             termino = False
-                            CASO_ACTUAL = EXPRESION_ANIDADA        
-                            return ["DP", {"desde": "EXPRESION_LOG_NO", "PASAR": CASO_ACTUAL}]
-                        
-                        continue
-                else:
-                    return ["CTO", "EXTRAÑO_2"]
-                    
-
-        elif tipo_de_elemento == FIN:
-            if termino:
-                return ["OK", {"EXPRESION_VALIDA"}]
+                            profundidad += 1
+                        else:
+                            termino = True
+                            profundidad -= 1
+                    else:
+                        return ["ERR", 0xa1]
+                
+                elif tipo_ in _OP_:
+                    if tipo in _VALOR_:
+                        termino = True
+                    elif tipo in _ANID_:
+                        if tipo in ("APAR", "ALLV", "ABLQ"):
+                            termino = False
+                            profundidad += 1
+                        else:
+                            return ["ERR", 0x02]
+                    elif tipo in _OP_NO_ and t in _OP_NO_:
+                        termino = False
+                    else:
+                        return ["ERR", 0xa2]
+                
+                elif tipo_ in _OP_NO_ and t_ in _OP_NO_:
+                    if tipo in _VALOR_:
+                        termino = True
+                    elif tipo in _ANID_:
+                        if tipo in ("APAR", "ALLV", "ABLQ"):
+                            termino = False
+                            profundidad += 1
+                        else:
+                            return ["ERR", 0x03]
+                    else:
+                        return ["ERR", 0xa3]
+                
+                elif tipo_ in _ANID_:
+                    if tipo_ in ("APAR", "ALLV", "ABLQ"):
+                        if tipo in _ANID_:
+                            if tipo in ("APAR", "ALLV", "ABLQ"):
+                                termino = False
+                                profundidad += 1
+                                # aumento profundidad
+                            else:
+                                termino = False
+                                profundidad -= 1
+                                # disminuyo profundidad
+                        elif tipo in _VALOR_:
+                            termino = False
+                        elif tipo in _OP_NO_ and t in _OP_NO_:
+                            termino = False
+                        else:
+                            return ["ERR", 0xa4]
+                    else:
+                        if tipo in _ANID_:
+                            if tipo in ("APAR", "ALLV", "ABLQ"):
+                                termino = False
+                                profundidad += 1
+                                # aumento profundidad
+                            else:
+                                termino = True
+                                profundidad -= 1
+                                # disminuyo profundidad
+                        elif tipo in _OP_:
+                            termino = False
+                        else:
+                            return ["ERR", 0xb4]
+            
+            if (tipo in _OP_ and t not in _OP_NO_) and memoria is None:
+                return ["ERR", 0xa5]
             else:
-                return ["ERR", {"EXPRESION_INCOMPLETA"}]
-        else:
-            return ["ERR", {"TIPO_ELEMENTO_EXTRAÑO"}]
-
+                memoria = valor
+        
+        if tipo_de_elemento == FIN:
+            if termino:
+                return ["OK", None]
+            else:
+                return ["ERR", "EXP_INCOMPLETA"]
+        
+        i+=1
 
 if en_prueba:
     print(validador(prueba))
