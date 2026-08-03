@@ -12,15 +12,17 @@ cambiar_entorno = False
 
 if cambiar_entorno:
     from Tokenizador import tokenizador
+    from Parser import parser
     from ModulErr import Err, mensaje_imprimible
     from ModulCTO import CTO_str
 else:
     from .Tokenizador import tokenizador
+    from .Parser import parser
     from .ModulErr import Err, mensaje_imprimible
     from .ModulCTO import CTO_str
 
 if en_prueba:
-    ruta = "C:\\Users\\Usuario\\Desktop\\ProtoGex\\ProtoGex Entorno.txt"
+    ruta = "C:\\Users\\Usuario\\Desktop\\Proto-Ajust\\ProtoGex Entorno.txt"
 
     with open(ruta, "r", encoding="utf-8") as leer:
         texto_crudo = leer.read()
@@ -54,14 +56,14 @@ def ejecutar_ModulCTO(
         return mensaje_CTO
     except Exception:
         traceCTOMC = traceback.format_exc()
-        return f"\x1b[31;1m[CTO2]:\x1b[31m\n\tocurrió un problema en el módulo ModulCTO.py en el Gestionador.py\n\n\tdatos:\n\t\t{traceCTOMC}\x1b[0m"
+        return f"\x1b[31;1m[CTO2]:\xb1[31m\n\tocurrió un problema en el módulo ModulCTO.py en el Gestionador.py\n\n\tdatos:\n\t\t{traceCTOMC}\x1b[0m"
     
 
 def Gestionar(
     texto_crudo: str
 ):
     if not isinstance(texto_crudo, str):
-        raise TypeError(f"'texto_crudo' de tipo str, apareció: {type(texto_crudo)}")
+        raise TypeError(f"texto_crudo de tipo str, apareció: {type(texto_crudo)}")
 
     guardado = None
 
@@ -72,7 +74,7 @@ def Gestionar(
         resultado_lexer, cto_lexer, _ = tokenizador(texto_crudo)
         # resultado_lexer: [rcode, datos, estructura_extra]
         # cto_lexer:       ["CTO", {...}, traceback]
-        # _:               depurador (no lo tengo en cuenta)
+        # _:               depurador
 
         if cto_lexer is not None:  # CRITICO!!!
             return ["CTO", ejecutar_ModulCTO(cto_lexer)]
@@ -86,11 +88,9 @@ def Gestionar(
                 else:
                     return ["ERR", r_mr]
             if rcode in ("VACIO", "OK"):
-                # pasa al siguiente proceso,
-                # pero en este caso, el proceso
-                # está en desarrollo, así que
-                # devuelvo el resultado del lexer (OK).
-                return [rcode, data]
+                if rcode == "VACIO":
+                    return [rcode, data]
+                
                 
 
     except Exception:
@@ -105,9 +105,23 @@ def Gestionar(
     # parse:
     # ===============================================================
     # IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+    try:
+        resultado_parser = parser(data)
+
+        rcode = resultado_lexer[0]
+
+        if rcode == "ERR":
+            return resultado_parser
+        else:
+            return resultado_parser
+    except Exception:
+        traceCTO_PARSER = traceback.format_exc()
+        return ["CTO", ejecutar_ModulCTO(["CTO", {"ORIGEN": "Gestionador", "SUB": "Parser"}, traceCTO_PARSER])]
 
     # IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
     # ===============================================================
+
+
 
 if en_prueba:
     print(Gestionar(texto_crudo))
