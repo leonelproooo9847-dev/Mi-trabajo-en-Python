@@ -1,1 +1,15 @@
-X = 3 + 4 * _NO_ 2
+CREAR :: x
+
+x = VERDAD
+
+SI (
+	(x == VERDAD) ; operación inválida
+	_Y_
+	(
+        _NO_ 
+        FALSO
+    )
+)
+    MOSTRAR > "algo se ejecuta :)"
+
+# debería salir 'SINTAXIS_VALIDA' #
