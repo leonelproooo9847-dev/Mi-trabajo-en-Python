@@ -1,23 +1,35 @@
 import traceback
 
-en_prueba = True
+en_prueba = False
+cambiar_entorno = False
+
 
 if en_prueba:
     prueba = None
 
-def parser(
-    data: list
-):
-    if data is not isinstance(data, list):
-        raise TypeError(f"PARSER: Objeto invalido, es esperaba una lista y apareció: {type(data)}")
-    
-    return 0
-    
-    '''
-    EXP:
-        CASO_1: VALOR, (OP, VALOR)*
-        CASO_2: OP_LOG_NO, EXP
-        CASO_3: (ANID, EXP, ANID)*
+if cambiar_entorno:
+    from Analizadores_sintacticos.analizador_1 import validador
+else:
+    from .Analizadores_sintacticos.analizador_1 import validador
 
-    todavía sin procesos
-    '''
+def parser(
+    secuencia: list
+):
+    if not isinstance(secuencia, list):
+        raise TypeError(f"PARSER: Objeto invalido, es esperaba una lista y apareció: {type(secuencia)}")
+    
+    try:
+        resultado = validador(secuencia)
+
+        rcode = resultado[0]
+
+        if rcode == "ERR":
+            return resultado
+        else:
+            return resultado
+    except Exception:
+        traceCTOVL = traceback.format_exc()
+        return ["CTO", {"ORIGEN": "Parser", "SUB": "ANLIZ_1"}, traceCTOVL]
+
+if en_prueba:
+    print(parser(prueba))
