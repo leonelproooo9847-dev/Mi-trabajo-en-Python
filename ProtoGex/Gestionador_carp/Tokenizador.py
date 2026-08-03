@@ -26,7 +26,7 @@ else:
     from .Analizadores_lexicos.etapa_8 import secuencia_de_tokens
 
 if en_prueba:
-    ruta = "C:\\Users\\Usuario\\Desktop\\Proto-Ajust\\ProtoGex Entorno.txt"
+    ruta = "C:\\Users\\Usuario\\Desktop\\ProtoGex\\Entorno ProtoGex.txt"
 
     with open(ruta, "r", encoding="utf-8") as leer:
 
